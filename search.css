@@ -1,5 +1,8 @@
-html {
+body {
+  height: 100vh;
+  box-sizing: border-box;
   padding: 20px;
+  margin: 0;
 }
 
 .search {
@@ -11,6 +14,7 @@ html {
   border-radius: 5px;
   height: 60px;
   max-width: 370px;
+  min-width: 220px;
   display: flex;
   align-items: center;
   position: relative;
