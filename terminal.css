@@ -1,0 +1,148 @@
+body {
+  height: 50vh;
+  box-sizing: border-box;
+  padding: 20px;
+  margin: 0;
+}
+
+.terminal {
+  border-radius: 10px;
+  background: #131212;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  min-height: 200px;
+}
+
+.top {
+  color: #c2c2c2;
+  background-color: #3e3e3e;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 11px;
+  padding: 5px 10px;
+  padding-right: 60px;
+  box-sizing: border-box;
+  height: 20px;
+  min-height: 20px;
+  text-align: center;
+  vertical-align: top;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.top .title {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: block;
+  float: left;
+  margin-right: 5px;
+}
+.red {
+  background-color: #e52a2a;
+}
+.yellow {
+  background-color: #e5bc2a;
+}
+.green {
+  background-color: #2ae53d;
+}
+
+.terminal ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.output {
+  flex-grow: 2;
+  margin: 20px !important;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+.output::-webkit-scrollbar {
+  width: 5px;
+}
+.output::-webkit-scrollbar:horizontal {
+  height: 5px;
+}
+.output::-webkit-scrollbar-thumb {
+  height: 5px;
+  background: #343434;
+  border-radius: 5px;
+}
+.output::-webkit-scrollbar-corner {
+  display: none;
+}
+
+.output li {
+  font-family: "Roboto Mono", monospace;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 12px;
+  white-space: pre;
+  text-wrap: wrap;
+}
+.output li:not(:first-child) {
+  margin-top: 14px;
+}
+
+.terminal input:focus {
+  outline: none;
+}
+
+.command-line {
+  font-family: "Roboto Mono", monospace;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 12px;
+
+  border: none;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #3e3e3e;
+  caret-color: #d9d9d9;
+
+  position: relative;
+}
+
+.command-help {
+  margin: 5px 20px 15px 20px;
+
+  position: relative;
+}
+
+.command-help ul {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(100%);
+
+  font-family: "Roboto Mono", monospace;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 12px;
+
+  background-color: #343434;
+  border-radius: 5px;
+  padding: 10px;
+}
+.command-help li {
+  margin-top: 14px;
+}
+.command-help li:first-child {
+  margin-top: 0;
+}

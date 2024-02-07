@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="search.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <form id="search" class="search">
+        <label for="query">Search</label>
+        <input id="query_input" name="query" type="text" placeholder="Search" spellcheck="false" />
+        <button id="submit" type="submit" class="submit"></button>
+        <div class="results" id="results"></div>
+    </form>
+</body>
+
+<script>
+    async function fetchProducts(query) {
+        showLoader();
+        const url = `https://dummyjson.com/products/search?q=${query}&limit=5&delay=1000`;
+
+        const data = await fetch(url).then(res => {
+            hideLoader();
+            return res.json();
+        });
+
+        return data.products;
+    }
+
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
+
+    const results = document.getElementById('results');
+    const query_input = document.getElementById('query_input');
+    const submit = document.getElementById('submit');
+    const search = document.getElementById('search');
+
+    function showLoader() {
+        submit.classList.add("loading");
+    }
+    function hideLoader() {
+        submit.classList.remove("loading");
+    }
+
+    // // Updates results while you type
+    // query_input.addEventListener('input', e => {
+    //     e.preventDefault();
+
+    //     updateResults(e.target.value);
+    // });
+
+    search.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const query = form.elements["query"].value;
+        updateResults(query);
+    });
+
+    async function updateResults(query) {
+        if (!query || query === "") {
+            removeAllChildNodes(results);
+            return;
+        }
+
+        const products = await fetchProducts(query);
+
+        const ul = document.createElement('ul');
+
+        products.forEach(product => {
+            const li = document.createElement('li');
+
+            const title = document.createElement('span');
+            title.innerText = product.title;
+            title.classList.add('title');
+
+            const price = document.createElement('span');
+            price.innerText = product.price + "$";
+            price.classList.add('price');
+
+            li.appendChild(title);
+            li.appendChild(price);
+
+            ul.appendChild(li);
+        });
+        if (products.length === 0) {
+            const li = document.createElement('li');
+
+            const title = document.createElement('span');
+            title.innerText = "No matching results";
+            title.classList.add('title');
+            title.classList.add('disabled');
+
+            li.appendChild(title);
+
+            ul.appendChild(li);
+        }
+
+        removeAllChildNodes(results);
+        results.appendChild(ul);
+    }
+
+
+</script>

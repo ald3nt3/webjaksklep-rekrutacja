@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="terminal.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="terminal">
+        <div class="top">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+            <span class="title">
+                webjaksklep
+            </span>
+        </div>
+        <ul id="output" class="output"></ul>
+        <input id="command-line" class="command-line" type="text" spellcheck="false" />
+        <div id="command-help" class="command-help"></div>
+    </div>
+</body>
+
+<script>
+    const CUSTOM_COMMANDS = {
+        hello: {
+            msg: "Hello :)"
+        },
+        /* non-standard commands */
+    }
+
+    let history = [];
+    let commandIndex = history.length;
+    let commandMem = "";
+    const commandList = ["clear", "help", "quote", "double X", ...Object.keys(CUSTOM_COMMANDS)];
+
+    const commandLine = document.getElementById("command-line");
+    const commandHelp = document.getElementById("command-help");
+    const output = document.getElementById("output");
+
+    function addToHistory(command) {
+        history.push(command);
+        commandIndex = history.length;
+    }
+
+    function addToOutput(text, style = "") {
+        const li = document.createElement('li')
+        li.innerText = text;
+        li.style = style;
+        output.appendChild(li);
+        output.scrollTop = output.scrollHeight;
+    }
+
+    function terminalResponse(text) {
+        addToOutput("terminal: " + text);
+    }
+
+    commandLine.addEventListener('keydown', function (e) {
+        // enter
+        if ((e.keyCode || e.which) === 13) {
+            addToHistory(e.target.value);
+            addToOutput("you: " + e.target.value);
+            executeCommand(e.target.value);
+            this.value = "";
+        }
+        // up
+        if ((e.keyCode || e.which) === 38) {
+            if (commandIndex === history.length) {
+                commandMem = e.target.value
+            }
+            if (commandIndex !== 0) {
+                commandIndex--;
+                this.value = history[commandIndex];
+            }
+            e.preventDefault();
+            moveCursorToEnd(this);
+        }
+        // down
+        if ((e.keyCode || e.which) === 40) {
+            if (commandIndex !== history.length) {
+                commandIndex++;
+                if (commandIndex === history.length) {
+                    this.value = commandMem;
+                } else {
+                    this.value = history[commandIndex];
+                }
+            }
+            e.preventDefault();
+            moveCursorToEnd(this);
+        }
+    })
+
+    function moveCursorToEnd(input) {
+        const end = input.value.length;
+        input.selectionEnd = input.selectionStart = end;
+        input.focus();
+    }
+
+    async function executeCommand(cmd) {
+        const command = cmd.trim();
+
+        // standard commands
+        if (command === "clear") {
+            history = [];
+            commandIndex = 0;
+            removeAllChildNodes(output);
+            return;
+        }
+        if (command === "quote") {
+            const quote = await fetchRandomQuote();
+            terminalResponse(quote);
+            return;
+        }
+        if (command.match(/double\s[\+\-]*\d*[.,]*\d*/g)) {
+            const arg = command.split(" ")[1];
+            if (!arg.match(/^[\+\-]*\d*[.,]*\d*$/g)) {
+                terminalResponse("double: Invalid argument \"" + arg + "\"");
+                return;
+            }
+            const num = parseFloat(arg);
+            terminalResponse(num * 2);
+            return;
+        }
+        if (command === "help") {
+            let helpText = "";
+            commandList.forEach(c => {
+                helpText += "\n\t" + c;
+            });
+            terminalResponse(helpText);
+            return;
+        }
+
+        // custom commands
+        let defined = false;
+        Object.keys(CUSTOM_COMMANDS).forEach(customCommand => {
+            if (command === customCommand) {
+                terminalResponse(CUSTOM_COMMANDS[customCommand].msg);
+                defined = true;
+                return;
+            }
+        });
+
+        // undefined command
+        if (!defined) addToOutput("Command \"" + command + "\" is not defined", "font-style: italic; color: #3e3e3e");
+    }
+
+    async function fetchRandomQuote() {
+        const data = await fetch("https://dummyjson.com/quotes/random").then(res => res.json())
+        return data.quote;
+    }
+
+    // also used in search
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
+
+    commandLine.addEventListener("keyup", function (e) {
+        const val = this.value;
+
+        removeAllChildNodes(commandHelp);
+        if (!val) { return; }
+
+        let ul = document.createElement("ul");
+        for (let i = 0; i < commandList.length; i++) {
+            if (commandList[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                let li = document.createElement("li");
+                li.innerHTML = "<b>" + commandList[i].substr(0, val.length) + "</b>";
+                li.innerHTML += commandList[i].substr(val.length);
+                ul.appendChild(li);
+            }
+        }
+
+        if(ul.childElementCount === 0) return;
+        commandHelp.appendChild(ul);
+    });
+
+</script>
